@@ -20,3 +20,11 @@ git clone https://github.com/caio-bernardo/Scheduler
 ```
 
 Na pasta do projeto, execute o comando `make` para compilar o código. Ou vá direto para o comando `make run` para executá-lo.
+
+## Tarefas
+- [x] Ler os arquivos e criar os processos
+- [ ] Rodar os processos
+- [ ] Criar o sistema de interrupção, com mudança de contexto (Round Robin)
+- [ ] Logs do escalonador
+- [ ] Calcular média de ações (ver o pdf)
+- [ ] Armazenar em um arquivo saida.txt
