@@ -23,8 +23,9 @@ Na pasta do projeto, execute o comando `make` para compilar o código. Ou vá di
 
 ## Tarefas
 - [x] Ler os arquivos e criar os processos
-- [ ] Rodar os processos
-- [ ] Criar o sistema de interrupção, com mudança de contexto (Round Robin)
+- [x] Rodar os processos
+- [x] Criar o sistema de interrupção, com mudança de contexto (Round Robin)
+- [ ] Deixar o código similar as exigências do EP (ex.: tabela de processos)
 - [ ] Logs do escalonador
 - [ ] Calcular média de ações (ver o pdf)
 - [ ] Armazenar em um arquivo saida.txt

@@ -7,48 +7,90 @@ import java.util.*;
 
 public class Scheduler {
     private int quantum;
-    private List<ProcessControlBlock> processTable;
 
-    private Queue<Integer> ready;
-    private Queue<Integer> waiting;
-
-    private int executingProcessId;
+    // TODO: criar tabela de processos, onde todos os processos são armazenados e gerenciar de acordo.
+    private Queue<ProcessControlBlock> ready;
+    private Queue<ProcessControlBlock> waiting;
 
     public Scheduler(int quantum) {
         this.quantum = quantum;
-        processTable = new ArrayList<>();
         ready = new LinkedList<>();
         waiting = new LinkedList<>();
     }
 
     /// Adiciona um processo a tabela de processos. Todos os novos processos vão para a fila de prontos
     public void addProcess(ProcessControlBlock process) {
-        processTable.add(process);
-        ready.add(processTable.size() - 1);
+        ready.add(process);
     }
 
     /// Adiciona uma lista de processos a tabela de processos. Todos os novos processos vão para a fila de prontos
     public void appendProcesses(List<ProcessControlBlock> processes) {
-        processTable.addAll(processes);
-        // TODO: adicionar a lista a fila de prontos
+        ready.addAll(processes);
     }
 
     /// Começa a executar o escalonador com sua lista de processos.
     public void run() {
-        while (!ready.isEmpty() ||  !waiting.isEmpty()) {
-            // pega o processo executando atualmente
-            // acorda processos dormindo
+        // Roda enquanto houverem processos ativos
+        outer: while (!ready.isEmpty() && !waiting.isEmpty()) {
+            // decrementa o sono de todos os processos
+            waiting.forEach(ProcessControlBlock::decrementSleepTime);
+            // acorda o processo dormindo
+            if (waiting.peek() != null && waiting.peek().getSleepTime() == 0) {
+                var proc = waiting.remove();
+                proc.setState(ProcessState.READY);
+                ready.add(proc);
+            }
+            // pega o processo executando atualmente (se existir)
+            var executingProcess = ready.poll();
+            if (executingProcess == null) {
+                continue;
+            }
+
+            executingProcess.setState(ProcessState.EXEC);
+
             for (int i = 0; i < quantum; i++) {
                 // pega a instrução do processo executando
-
+                String instruction = executingProcess.fetchInstruction();
                 // executa a instrução
-                // 1. [XY]=?. Atualiza o PCB
-                // 2. COM faz nada
-                // 3. E/S bloqueia o processo, manda para a fila de espera e encerra o loop maior antes
-                // 4. SAIDA encerra o processo, retira da lista de processo e encerra o loop mais cedo
+                switch (instruction) {
+                    // atribui o valor da instrução para os registradores X ou Y
+                    case String s when s.matches("[XY]=[0-9]*") -> {
+                        String[] parts = s.split("=", 2);
+                        if (parts.length != 2) {
+                            throw new RuntimeException("Instruction in wrong format: " + instruction);
+                        }
+                        if (parts[0].equals("X")) {
+                            executingProcess.setX(Integer.parseInt(parts[1]));
+                        } else if (parts[0].equals("Y")) {
+                            executingProcess.setY(Integer.parseInt(parts[1]));
+                        } else {
+                            throw new RuntimeException("Instruction in wrong format: " + instruction);
+                        }
+                    }
+                    case "COM" -> {
+                        // Faz nada
+                    }
+                    case "E/S" -> {
+                        // Coloca o processo para dormir por 2 quantum
+                        executingProcess.setState(ProcessState.BLOCKING);
+                        executingProcess.setSleepTime(2);
+                        waiting.add(executingProcess);
+                        // programa bloqueou, não devolve o processo atual para a fila de prontos
+                        continue outer;
+                    }
+                    case "SAIDA" -> {
+                        // programa acabou, não devolve o processo atual para a fila de prontos
+                        continue outer;
+                    }
+                    default -> {
+                        throw new RuntimeException("Invalid instruction: " + instruction);
+                    }
+                }
             }
 
             //  adiciona o processo em execução de volta a fila de prontos
+            executingProcess.setState(ProcessState.READY);
+            ready.add(executingProcess);
         }
     }
 }

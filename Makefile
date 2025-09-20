@@ -13,7 +13,7 @@ all: $(CLASSES)
 
 $(BIN_DIR)/%.class: $(SRC_DIR)/%.java
 	@mkdir -p $(dir $@)
-	@javac -d $(BIN_DIR) $<
+	@javac -d $(BIN_DIR) -sourcepath $(SRC_DIR) $<
 
 clean:
 	rm -rf $(BIN_DIR)
