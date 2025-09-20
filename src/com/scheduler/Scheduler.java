@@ -6,21 +6,16 @@ import com.scheduler.process.ProcessState;
 import java.util.*;
 
 public class Scheduler {
-    private int quantum;
+    private final int quantum;
 
     // TODO: criar tabela de processos, onde todos os processos são armazenados e gerenciar de acordo.
-    private Queue<ProcessControlBlock> ready;
-    private Queue<ProcessControlBlock> waiting;
+    private final Queue<ProcessControlBlock> ready;
+    private final Queue<ProcessControlBlock> waiting;
 
     public Scheduler(int quantum) {
         this.quantum = quantum;
         ready = new LinkedList<>();
         waiting = new LinkedList<>();
-    }
-
-    /// Adiciona um processo a tabela de processos. Todos os novos processos vão para a fila de prontos
-    public void addProcess(ProcessControlBlock process) {
-        ready.add(process);
     }
 
     /// Adiciona uma lista de processos a tabela de processos. Todos os novos processos vão para a fila de prontos
@@ -30,7 +25,7 @@ public class Scheduler {
 
     /// Começa a executar o escalonador com sua lista de processos.
     public void run() {
-        // Roda enquanto houverem processos ativos
+        // Roda enquanto houver processos ativos
         outer: while (!ready.isEmpty() && !waiting.isEmpty()) {
             // decrementa o sono de todos os processos
             waiting.forEach(ProcessControlBlock::decrementSleepTime);
@@ -82,9 +77,7 @@ public class Scheduler {
                         // programa acabou, não devolve o processo atual para a fila de prontos
                         continue outer;
                     }
-                    default -> {
-                        throw new RuntimeException("Invalid instruction: " + instruction);
-                    }
+                    default -> throw new RuntimeException("Invalid instruction: " + instruction);
                 }
             }
 
