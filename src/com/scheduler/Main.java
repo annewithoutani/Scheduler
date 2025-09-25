@@ -32,7 +32,6 @@ public class Main {
 
         Scheduler sched = new Scheduler(quantum);
         sched.appendProcesses(processes);
-
         sched.run();
     }
 }

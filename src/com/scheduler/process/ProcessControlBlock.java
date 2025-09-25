@@ -8,9 +8,9 @@ import java.util.List;
 /// Bloco Controlador do Processo
 /// Armazena informações para devolver o processo a CPU
 public class ProcessControlBlock {
-    private static int nextPID = 0;
+    private static int nextPID = 1;
     public final int PID;
-    String name;
+    public final String name;
     /// Program Counter
     int PC;
     /// Estado do processo (Ready, Exec, Block)
