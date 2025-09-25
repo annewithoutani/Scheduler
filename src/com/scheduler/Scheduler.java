@@ -46,7 +46,9 @@ public class Scheduler {
             // Roda enquanto houver processos ativos
             outer: while (!ready.isEmpty() || !waiting.isEmpty()) {
                 // decrementa o sono de todos os processos
-                waiting.forEach( (p) -> {processTable.get(p).decrementWaitTime();} );
+                waiting.forEach((p) -> {
+                    processTable.get(p).decrementWaitTime();
+                });
                 // acorda o processo dormindo
                 if (waiting.peek() != null && processTable.get(waiting.peek()).getWaitTime() == 0) {
                     var proc = waiting.remove();
@@ -62,7 +64,7 @@ public class Scheduler {
                 executingProcess.setState(ProcessState.EXEC);
                 // Adiciona mensagem de execução ao log
                 logFile.write(String.format("Executando %s\n", executingProcess.name));
-                
+
                 int i;
                 for (i = 0; i < quantum; i++) {
                     // pega a instrução do processo executando
@@ -94,13 +96,15 @@ public class Scheduler {
                             // Adiciona mensagem de interrupção ao log
                             logFile.write(String.format("E/S iniciada em %s\n", executingProcess.name));
                             String ins = i == 0 ? new String("instrução") : new String("instruções");
-                            logFile.write(String.format("Interrompendo %s após %d %s\n", executingProcess.name, i+1, ins));
+                            logFile.write(
+                                    String.format("Interrompendo %s após %d %s\n", executingProcess.name, i + 1, ins));
                             // programa bloqueou, não devolve o processo atual para a fila de prontos
                             continue outer;
                         }
                         case "SAIDA" -> {
                             // Adiciona mensagem de finalização ao log
-                            logFile.write(String.format("%s terminado. X=%d. Y=%d\n", executingProcess.name, executingProcess.getX(), executingProcess.getY()));
+                            logFile.write(String.format("%s terminado. X=%d. Y=%d\n", executingProcess.name,
+                                    executingProcess.getX(), executingProcess.getY()));
                             // Programa acabou, não devolve o processo atual para a fila de prontos
                             continue outer;
                         }
@@ -113,7 +117,7 @@ public class Scheduler {
                 ready.add(executingProcess.PID);
                 // Adiciona monsagem de interrupção ao log
                 logFile.write(String.format("E/S iniciada em %s\n", executingProcess.name));
-                String ins = i == 0 ? new String("instrução") : new String("instruções");
+                String ins = i == 1 ? new String("instrução") : new String("instruções");
                 logFile.write(String.format("Interrompendo %s após %d %s\n", executingProcess.name, i, ins));
             }
         } catch (IOException e) {
