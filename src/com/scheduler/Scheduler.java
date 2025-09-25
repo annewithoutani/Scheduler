@@ -114,7 +114,7 @@ public class Scheduler {
                 // Adiciona monsagem de interrupção ao log
                 logFile.write(String.format("E/S iniciada em %s\n", executingProcess.name));
                 String ins = i == 0 ? new String("instrução") : new String("instruções");
-                logFile.write(String.format("Interrompendo %s após %d %s\n", executingProcess.name, i+1, ins));
+                logFile.write(String.format("Interrompendo %s após %d %s\n", executingProcess.name, i, ins));
             }
         } catch (IOException e) {
             System.out.println("Couldn't write to logfile: " + e.getMessage());
