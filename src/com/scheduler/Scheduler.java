@@ -9,18 +9,23 @@ public class Scheduler {
     private final int quantum;
 
     // TODO: criar tabela de processos, onde todos os processos são armazenados e gerenciar de acordo.
-    private final Queue<ProcessControlBlock> ready;
-    private final Queue<ProcessControlBlock> waiting;
+    private HashMap<Integer, ProcessControlBlock> processTable;
+    private final Queue<Integer> ready; // Lista de processos prontos
+    private final Queue<Integer> waiting; // Lista de processos bloqueados
 
     public Scheduler(int quantum) {
         this.quantum = quantum;
+        this.processTable = new HashMap<>();
         ready = new LinkedList<>();
         waiting = new LinkedList<>();
     }
 
     /// Adiciona uma lista de processos a tabela de processos. Todos os novos processos vão para a fila de prontos
     public void appendProcesses(List<ProcessControlBlock> processes) {
-        ready.addAll(processes);
+        for(ProcessControlBlock p : processes) {
+            processTable.put(p.PID, p);
+            ready.add(p.PID);
+        }
     }
 
     /// Começa a executar o escalonador com sua lista de processos.
@@ -28,19 +33,19 @@ public class Scheduler {
         // Roda enquanto houver processos ativos
         outer: while (!ready.isEmpty() && !waiting.isEmpty()) {
             // decrementa o sono de todos os processos
-            waiting.forEach(ProcessControlBlock::decrementSleepTime);
+            waiting.forEach( (p) -> {processTable.get(p).decrementWaitTime();} );
             // acorda o processo dormindo
-            if (waiting.peek() != null && waiting.peek().getSleepTime() == 0) {
+            if (waiting.peek() != null && processTable.get(waiting.peek()).getWaitTime() == 0) {
                 var proc = waiting.remove();
-                proc.setState(ProcessState.READY);
+                processTable.get(proc).setState(ProcessState.READY);
                 ready.add(proc);
             }
             // pega o processo executando atualmente (se existir)
-            var executingProcess = ready.poll();
-            if (executingProcess == null) {
+            var executingPID = ready.poll();
+            if (executingPID == null) {
                 continue;
             }
-
+            var executingProcess = processTable.get(executingPID);
             executingProcess.setState(ProcessState.EXEC);
 
             for (int i = 0; i < quantum; i++) {
@@ -68,8 +73,8 @@ public class Scheduler {
                     case "E/S" -> {
                         // Coloca o processo para dormir por 2 quantum
                         executingProcess.setState(ProcessState.BLOCKING);
-                        executingProcess.setSleepTime(2);
-                        waiting.add(executingProcess);
+                        executingProcess.setWaitTime(2);
+                        waiting.add(executingProcess.PID);
                         // programa bloqueou, não devolve o processo atual para a fila de prontos
                         continue outer;
                     }
@@ -83,7 +88,7 @@ public class Scheduler {
 
             //  adiciona o processo em execução de volta a fila de prontos
             executingProcess.setState(ProcessState.READY);
-            ready.add(executingProcess);
+            ready.add(executingProcess.PID);
         }
     }
 }

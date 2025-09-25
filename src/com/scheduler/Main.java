@@ -26,7 +26,7 @@ public class Main {
         int quantum = 0;
         try (Scanner scanner = new Scanner(new File("programas/quantum.txt"))) {
             quantum = scanner.nextInt();
-        } catch (FileNotFoundException _) {
+        } catch (FileNotFoundException e) {
             System.err.println("O arquivo quantum.txt não foi encontrado.");
         }
 
