@@ -8,12 +8,14 @@ import java.util.List;
 /// Bloco Controlador do Processo
 /// Armazena informações para devolver o processo a CPU
 public class ProcessControlBlock {
-    String name;
+    private static int nextPID = 1;
+    public final int PID;
+    public final String name;
     /// Program Counter
     int PC;
     /// Estado do processo (Ready, Exec, Block)
     ProcessState state;
-    int SleepTime;
+    int waitTime;
 
     /// Registradores comuns
     int X;
@@ -22,12 +24,14 @@ public class ProcessControlBlock {
     List<String> program;
 
     public ProcessControlBlock(String name, List<String> program) {
+        this.PID = nextPID;
+        nextPID += 1;
         this.name = name;
         this.program = program;
         this.PC = 0;
         this.X = 0;
         this.Y = 0;
-        this.SleepTime = 0;
+        this.waitTime = 0;
         this.state = ProcessState.READY;
     }
 
@@ -44,7 +48,6 @@ public class ProcessControlBlock {
         return inst;
     }
 
-
     public ProcessState getState() {
         return state;
     }
@@ -53,17 +56,16 @@ public class ProcessControlBlock {
         this.state = state;
     }
 
-    public void setSleepTime(int SleepTime) {
-        this.SleepTime = Math.max(SleepTime, 0);
+    public void setWaitTime(int SleepTime) {
+        this.waitTime = Math.max(SleepTime, 0);
     }
 
-
-    public int getSleepTime() {
-        return this.SleepTime;
+    public int getWaitTime() {
+        return this.waitTime;
     }
 
-    public void decrementSleepTime() {
-        this.SleepTime = Math.max(0, this.SleepTime - 1);
+    public void decrementWaitTime() {
+        this.waitTime = Math.max(0, this.waitTime - 1);
     }
 
     public int getX() {
@@ -82,5 +84,3 @@ public class ProcessControlBlock {
         Y = y;
     }
 }
-
-
