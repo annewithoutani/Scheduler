@@ -12,6 +12,8 @@ import java.nio.file.Files;
 
 public class Scheduler {
     private final int quantum;
+    private int numQuanti;
+    private int numInstructions;
 
     private HashMap<Integer, ProcessControlBlock> processTable;
     private final Queue<Integer> ready; // Lista de processos prontos
@@ -19,6 +21,8 @@ public class Scheduler {
 
     public Scheduler(int quantum) {
         this.quantum = quantum;
+        this.numQuanti = 0;
+        this.numInstructions = 0;
         this.processTable = new HashMap<>();
         ready = new LinkedList<>();
         waiting = new LinkedList<>();
@@ -45,11 +49,11 @@ public class Scheduler {
         try (BufferedWriter logFile = Files.newBufferedWriter(logFilePath, StandardOpenOption.APPEND)) {
             // Roda enquanto houver processos ativos
             outer: while (!ready.isEmpty() || !waiting.isEmpty()) {
-                // decrementa o sono de todos os processos
+                // decrementa a espera de todos os processos
                 waiting.forEach((p) -> {
                     processTable.get(p).decrementWaitTime();
                 });
-                // acorda o processo dormindo
+                // acorda o processo em espera
                 if (waiting.peek() != null && processTable.get(waiting.peek()).getWaitTime() == 0) {
                     var proc = waiting.remove();
                     processTable.get(proc).setState(ProcessState.READY);
@@ -62,11 +66,15 @@ public class Scheduler {
                 }
                 var executingProcess = processTable.get(executingPID);
                 executingProcess.setState(ProcessState.EXEC);
+                executingProcess.interruptions += 1;
+                numQuanti += 1;
+
                 // Adiciona mensagem de execução ao log
                 logFile.write(String.format("Executando %s\n", executingProcess.name));
 
                 int i;
                 for (i = 0; i < quantum; i++) {
+                    numInstructions += 1;
                     // pega a instrução do processo executando
                     String instruction = executingProcess.fetchInstruction();
                     // executa a instrução
@@ -120,6 +128,16 @@ public class Scheduler {
                 String ins = i == 1 ? new String("instrução") : new String("instruções");
                 logFile.write(String.format("Interrompendo %s após %d %s\n", executingProcess.name, i, ins));
             }
+            // Exibindo as médias de interrupções e instruções por quantum, além do valor do quantum
+            int numProcesses = 0;
+            int numInterruptions = 0;
+            for (ProcessControlBlock p : processTable.values()) {
+                numProcesses++;
+                numInterruptions += p.interruptions;
+            }
+            logFile.write(String.format("MEDIA DE INTERRUPCOES: %.2f\n", (float)numInterruptions/numProcesses));
+            logFile.write(String.format("MEDIA DE INSTRUCOES: %.2f\n", (float)numInstructions/numQuanti));
+            logFile.write(String.format("QUANTUM: %d\n", quantum));
         } catch (IOException e) {
             System.out.println("Couldn't write to logfile: " + e.getMessage());
         }

@@ -11,6 +11,7 @@ public class ProcessControlBlock {
     private static int nextPID = 1;
     public final int PID;
     public final String name;
+    public int interruptions;
     /// Program Counter
     int PC;
     /// Estado do processo (Ready, Exec, Block)
@@ -26,6 +27,7 @@ public class ProcessControlBlock {
     public ProcessControlBlock(String name, List<String> program) {
         this.PID = nextPID;
         nextPID += 1;
+        this.interruptions = 0;
         this.name = name;
         this.program = program;
         this.PC = 0;
