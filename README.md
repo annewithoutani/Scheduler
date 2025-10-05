@@ -8,7 +8,7 @@ Dado um conjunto de programas e um _quantum_, simular um escalonador de processo
 
 ## Requisitos
 É necessário ter as seguintes dependências instaladas para rodar o projeto.
-1. Java VM +22
+1. Java VM +24
 2. Git
 3. Make
 
@@ -25,7 +25,7 @@ Na pasta do projeto, execute o comando `make` para compilar o código. Ou vá di
 - [x] Ler os arquivos e criar os processos
 - [x] Rodar os processos
 - [x] Criar o sistema de interrupção, com mudança de contexto (Round Robin)
-- [ ] Deixar o código similar as exigências do EP (ex.: tabela de processos)
-- [ ] Logs do escalonador
-- [ ] Calcular média de ações (ver o pdf)
-- [ ] Armazenar em um arquivo saida.txt
+- [x] Deixar o código similar as exigências do EP (ex.: tabela de processos)
+- [x] Logs do escalonador
+- [ ] Testes com diferentes (10) quantuns.
+- [ ] Calcular média de trocas por processo e média de instruções por quantum

@@ -10,16 +10,16 @@ import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Files;
 
-public class Scheduler {
+public class Escalonador {
     private final int quantum;
     private int numQuanti;
     private int numInstructions;
 
-    private HashMap<Integer, ProcessControlBlock> processTable;
+    private final HashMap<Integer, ProcessControlBlock> processTable;
     private final Queue<Integer> ready; // Lista de processos prontos
     private final Queue<Integer> waiting; // Lista de processos bloqueados
 
-    public Scheduler(int quantum) {
+    public Escalonador(int quantum) {
         this.quantum = quantum;
         this.numQuanti = 0;
         this.numInstructions = 0;
@@ -28,9 +28,33 @@ public class Scheduler {
         waiting = new LinkedList<>();
     }
 
+    public static void main(String[] args) {
+
+        List<ProcessControlBlock> processes = new ArrayList<>();
+        try {
+            // Carrega os processos a partir dos arquivos.
+            for (int i = 1; i <= 10; i++) {
+                processes.add(ProcessControlBlock.fromFile(Path.of(String.format("programas/%02d.txt", i))));
+            }
+        } catch (IOException err) {
+            System.err.println("Falha em carregar os arquivos de programas: " + err);
+        }
+
+        int quantum = 0;
+        try (Scanner scanner = new Scanner(new File("programas/quantum.txt"))) {
+            quantum = scanner.nextInt();
+        } catch (FileNotFoundException e) {
+            System.err.println("O arquivo quantum.txt não foi encontrado.");
+        }
+
+        Escalonador sched = new Escalonador(quantum);
+        sched.appendProcesses(processes);
+        sched.run();
+    }
+
     /// Adiciona uma lista de processos a tabela de processos. Todos os novos processos vão para a fila de prontos
     public void appendProcesses(List<ProcessControlBlock> processes) {
-        Path logFilePath = Paths.get(String.format("log%02d.txt", quantum));
+        Path logFilePath = Paths.get("testes", String.format("log%02d.txt", quantum));
         try (BufferedWriter logFile = Files.newBufferedWriter(logFilePath)) {
             for (ProcessControlBlock p : processes) {
                 processTable.put(p.PID, p);
@@ -45,14 +69,12 @@ public class Scheduler {
 
     /// Começa a executar o escalonador com sua lista de processos.
     public void run() {
-        Path logFilePath = Paths.get(String.format("log%02d.txt", quantum));
+        Path logFilePath = Paths.get("testes", String.format("log%02d.txt", quantum));
         try (BufferedWriter logFile = Files.newBufferedWriter(logFilePath, StandardOpenOption.APPEND)) {
             // Roda enquanto houver processos ativos
             outer: while (!ready.isEmpty() || !waiting.isEmpty()) {
                 // decrementa a espera de todos os processos
-                waiting.forEach((p) -> {
-                    processTable.get(p).decrementWaitTime();
-                });
+                waiting.forEach((p) -> processTable.get(p).decrementWaitTime());
                 // acorda o processo em espera
                 if (waiting.peek() != null && processTable.get(waiting.peek()).getWaitTime() == 0) {
                     var proc = waiting.remove();
@@ -103,7 +125,7 @@ public class Scheduler {
                             waiting.add(executingProcess.PID);
                             // Adiciona mensagem de interrupção ao log
                             logFile.write(String.format("E/S iniciada em %s\n", executingProcess.name));
-                            String ins = i == 0 ? new String("instrução") : new String("instruções");
+                            String ins = i == 0 ? "instrução" : "instruções";
                             logFile.write(
                                     String.format("Interrompendo %s após %d %s\n", executingProcess.name, i + 1, ins));
                             // programa bloqueou, não devolve o processo atual para a fila de prontos
@@ -125,7 +147,7 @@ public class Scheduler {
                 ready.add(executingProcess.PID);
                 // Adiciona monsagem de interrupção ao log
                 logFile.write(String.format("E/S iniciada em %s\n", executingProcess.name));
-                String ins = i == 1 ? new String("instrução") : new String("instruções");
+                String ins = i == 1 ?  "instrução" : "instruções";
                 logFile.write(String.format("Interrompendo %s após %d %s\n", executingProcess.name, i, ins));
             }
             // Exibindo as médias de interrupções e instruções por quantum, além do valor do quantum

@@ -6,13 +6,5 @@ package com.scheduler.process;
 public enum ProcessState {
     READY,
     EXEC,
-    BLOCKING;
-
-    public ProcessState next() {
-        return switch (this) {
-            case READY -> ProcessState.EXEC;
-            case EXEC -> ProcessState.BLOCKING;
-            case BLOCKING -> ProcessState.READY;
-        };
-    }
+    BLOCKING
 }
