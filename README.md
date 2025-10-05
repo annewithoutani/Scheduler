@@ -19,7 +19,7 @@ Clone este repositório.
 git clone https://github.com/caio-bernardo/Scheduler
 ```
 
-Na pasta do projeto, execute o comando `make` para compilar o código. Ou vá direto para o comando `make run` para executá-lo.
+Na pasta do projeto, execute o comando `make` para compilar o código. Ou vá direto para o comando `make run` para executá-lo. Após isso, um arquivo de log será criado na pasta `testes`.
 
 ## Tarefas
 - [x] Ler os arquivos e criar os processos
