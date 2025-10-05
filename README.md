@@ -27,5 +27,5 @@ Na pasta do projeto, execute o comando `make` para compilar o código. Ou vá di
 - [x] Criar o sistema de interrupção, com mudança de contexto (Round Robin)
 - [x] Deixar o código similar as exigências do EP (ex.: tabela de processos)
 - [x] Logs do escalonador
+- [x] Calcular média de trocas por processo e média de instruções por quantum
 - [ ] Testes com diferentes (10) quantuns.
-- [ ] Calcular média de trocas por processo e média de instruções por quantum
