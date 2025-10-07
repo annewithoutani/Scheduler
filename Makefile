@@ -1,7 +1,7 @@
 SRC_DIR = src
 BIN_DIR = bin
 PACKAGE = com/scheduler
-MAIN_CLASS = com.scheduler.Main
+MAIN_CLASS = com.scheduler.Escalonador
 
 SOURCES = $(shell find $(SRC_DIR) -name "*.java")
 
